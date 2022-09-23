@@ -10,32 +10,26 @@ namespace TegraAPI.Controllers
     public class InventoryController : ControllerBase
     {
         private readonly defaultContext _context;
-        private readonly ILogger<WeatherForecastController> _logger;
         private readonly IConfiguration Configuration;
 
-        public InventoryController(ILogger<WeatherForecastController> logger, defaultContext context, IConfiguration iconfig)
+        public InventoryController(defaultContext context, IConfiguration iconfig)
         {
-            _logger = logger;
             _context = context;
             Configuration = iconfig;
         }
 
+        // Main products view
         [HttpGet(Name = "GetInventory")]
         public async Task<IEnumerable<VwInvAvailableReport>> GetInventory()
         {
             return await _context.VwInvAvailableReports.ToListAsync();
         }
 
-        [HttpGet("GetBoxes/{ProductId}", Name = "GetBoxes")]
-        public async Task<IEnumerable<VwInvProductDetail>> GetBoxes(int ProductId)
+        // Filter products view according to product code and/or no stock products
+        [HttpGet("SearchProducts/{ProductCode}/{NoStock}", Name = "SearchProducts")]
+        public async Task<IEnumerable<VwInvAvailableReport>> SearchProducts(string ProductCode, bool NoStock)
         {
-            return await _context.VwInvProductDetails.Where(x => x.ProductId == ProductId).ToListAsync();
-        }
-
-        [HttpGet("SearchProducts/{ProductName}/{NoStock}", Name = "SearchProducts")]
-        public async Task<IEnumerable<VwInvAvailableReport>> SearchProducts(string ProductName, bool NoStock)
-        {
-            if (ProductName == "-")
+            if (ProductCode == "-")
             {
                 if (NoStock)
                     return await _context.VwInvAvailableReports.Where(x => x.Quantity > 0).ToListAsync();
@@ -45,10 +39,17 @@ namespace TegraAPI.Controllers
             else
             {
                 if (NoStock)
-                    return await _context.VwInvAvailableReports.Where(x => x.Product.Contains(ProductName) && x.Quantity > 0 ).ToListAsync();
+                    return await _context.VwInvAvailableReports.Where(x => x.Product.Contains(ProductCode) && x.Quantity > 0 ).ToListAsync();
                 else
-                    return await _context.VwInvAvailableReports.Where(x => x.Product.Contains(ProductName)).ToListAsync();
+                    return await _context.VwInvAvailableReports.Where(x => x.Product.Contains(ProductCode)).ToListAsync();
             }
+        }
+
+        // Boxes detail according to product
+        [HttpGet("GetBoxes/{ProductId}", Name = "GetBoxes")]
+        public async Task<IEnumerable<VwInvProductDetail>> GetBoxes(int ProductId)
+        {
+            return await _context.VwInvProductDetails.Where(x => x.ProductId == ProductId).ToListAsync();
         }
     }
 }
