@@ -123,8 +123,6 @@ namespace TegraAPI.Models
                 entity.Property(e => e.BoxCode)
                     .HasMaxLength(15)
                     .IsUnicode(false);
-
-                entity.Property(e => e.DetailCreationDate).HasColumnType("datetime");
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -31,5 +31,24 @@ namespace TegraAPI.Controllers
         {
             return await _context.VwInvProductDetails.Where(x => x.ProductId == ProductId).ToListAsync();
         }
+
+        [HttpGet("SearchProducts/{ProductName}/{NoStock}", Name = "SearchProducts")]
+        public async Task<IEnumerable<VwInvAvailableReport>> SearchProducts(string ProductName, bool NoStock)
+        {
+            if (ProductName == "-")
+            {
+                if (NoStock)
+                    return await _context.VwInvAvailableReports.Where(x => x.Quantity > 0).ToListAsync();
+                else
+                    return await _context.VwInvAvailableReports.Where(x => x.Quantity >= 0).ToListAsync();
+            }
+            else
+            {
+                if (NoStock)
+                    return await _context.VwInvAvailableReports.Where(x => x.Product.Contains(ProductName) && x.Quantity > 0 ).ToListAsync();
+                else
+                    return await _context.VwInvAvailableReports.Where(x => x.Product.Contains(ProductName)).ToListAsync();
+            }
+        }
     }
 }
