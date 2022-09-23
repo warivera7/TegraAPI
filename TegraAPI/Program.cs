@@ -1,4 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using TegraAPI.Models;
+
 var builder = WebApplication.CreateBuilder(args);
+//Adding DBContext
+builder.Services.AddDbContext<defaultContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("TegraContext")));
 
 // Add services to the container.
 

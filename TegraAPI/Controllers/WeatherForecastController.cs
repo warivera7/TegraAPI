@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using TegraAPI.Models;
 
 namespace TegraAPI.Controllers
 {
@@ -12,10 +14,12 @@ namespace TegraAPI.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly defaultContext _context;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, defaultContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
@@ -28,6 +32,12 @@ namespace TegraAPI.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+        [HttpPost(Name = "GetProducts")]
+        public async Task<IEnumerable<InvProduct>> GetProducts()
+        {
+            return await _context.InvProducts.ToListAsync();
         }
     }
 }
